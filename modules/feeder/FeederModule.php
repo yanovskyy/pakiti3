@@ -135,12 +135,15 @@ class FeederModule extends DefaultModule {
 			# Decrypt the report
 			$data = Utils::getHttpVar('data');
   			$tmpFileIn = tempnam("/dev/shm/", "cern_IN_");
-  			$tmpFileOut = tempnam("/dev/shm/", "cern_OUT_");
 			# Store encrypted report into the file and the use openssl smime to decode it
 			if (file_put_contents($tmpFileIn, $data) === FALSE) {
+				unlink($tmpFileIn); 
 				throw new Exception("Cannot write to the file '$tmpFileIn' during decoding cern_1 report");
 			}
+  			$tmpFileOut = tempnam("/dev/shm/", "cern_OUT_");
 			if (system("openssl smime -decrypt -binary -inform DER -inkey ". Config::$CERN_REPORT_DECRYPTION_KEY ." -in $tmpFileIn -out $tmpFileOut") === FALSE) {
+				unlink($tmpFileOut);
+				unlink($tmpFileIn); 
 				throw new Exception("Cannot run openssl smime on the file '$tmpFileIn'");
 			}
 			# Clean up
@@ -152,6 +155,7 @@ class FeederModule extends DefaultModule {
 			    while (($line = fgets($handle)) !== false) {
 				$lineNumber++;
 				if ($lineNumber == 1 && trim($line) != "#") {
+					unlink($tmpFileOut);
 					throw new Exception("Bad format of the report, it should start with # '$tmpFileOut'");
 				} 
 				if ($lineNumber > 1 && trim($line) == "#") {
@@ -179,6 +183,7 @@ class FeederModule extends DefaultModule {
 			    }
 			} else {
 			    	// error opening the file.
+				unlink($tmpFileOut);
 				throw new Exception("Cannot open file with the report '$tmpFileOut'");
 			} 
 			fclose($handle);
