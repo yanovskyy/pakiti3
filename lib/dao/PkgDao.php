@@ -75,7 +75,7 @@ class PkgDao {
       from 
       	Pkg 
       where
-      	name='".$this->db->escape($name)."'");
+      	binary name='".$this->db->escape($name)."'");
     if ($id == null) {
       return -1;
     }
@@ -123,7 +123,7 @@ class PkgDao {
     if ($type == "id") {
       $where = "id=".$this->db->escape($value);
     } else if ($type == "name") {
-      $where = "name='".$this->db->escape($value)."'";
+      $where = "binary name='".$this->db->escape($value)."'";
     } else {
       throw new Exception("Undefined type of the getBy");
     }
