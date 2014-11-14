@@ -118,7 +118,7 @@ create table `ReportHost` (
 
 create table `Pkg` (
   `id` integer(10) not null auto_increment,
-  `name` varchar(254) not null,
+  `name` varchar(254) CHARACTER SET latin1 COLLATE latin1_bin not null,
   primary key (`id`),
   unique key (`name`)
 ) ENGINE=INNODB;
