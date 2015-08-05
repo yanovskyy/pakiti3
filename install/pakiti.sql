@@ -100,6 +100,14 @@ create table `HostTag` (
   foreign key (`tagId`) references Tag(`id`)  on delete cascade
 ) ENGINE=INNODB;
 
+create table `CveTag` (
+  `cveId` integer(10) not null,
+  `tagId` integer(10) not null,
+  unique key `unique` (`cveId`, `tagId`),
+  foreign key (`cveId`) references Cve(`id`) on delete cascade,
+  foreign key (`tagId`) references Tag(`id`)  on delete cascade
+) ENGINE=INNODB;
+
 create table `HostHostGroup` (
   `hostId` integer(10) not null,
   `hostGroupId` integer(10) not null,
