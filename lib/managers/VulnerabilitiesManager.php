@@ -27,6 +27,8 @@
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE. 
 
+require(realpath(dirname(__FILE__)) . '/../common/Loader.php');
+
 class VulnerabilitiesManager extends DefaultManager
 {
     private $_pakiti;

@@ -37,6 +37,26 @@ class CveDefsManager extends DefaultManager
         cveDefId={$cveDefId}, osGroupId={$osGroupId}");
     }
 
+    public function getCveByNameAndCveDefId($name, $cveDefId)
+    {
+        Utils::log(LOG_DEBUG, "Getting CVE its name [name=$name] and cveDefId [cveDefId=$cveDefId]", __FILE__, __LINE__);
+        $cve = $this->getPakiti()->getDao("Cve")->getCve();
+        if (is_object($cve)) {
+            $cve->setTag($this->getPakiti()->getManager("TagsManager")->getCveTags($cve));
+        }
+        return $cve;
+    }
+
+    public function getCvesByCveDef(CveDef &$cveDef)
+    {
+        $cves = $this->getPakiti()->getDao("Cve")->getCvesByCveDef($cveDef);
+        if (is_array($cves)) {
+            foreach ($cves as $cve) {
+                $cve->setTag($this->getPakiti()->getManager("TagsManager")->getCveTags($cve));
+            }
+        }
+    }
+
 
     /**
      * Return count of Cves for a specific host
@@ -51,6 +71,18 @@ class CveDefsManager extends DefaultManager
 
         }
         return $cvesCount;
+    }
+
+    public function getCvesWithTags()
+    {
+        $cves = $this->getAllCves();
+        $cvesWithTags = array();
+        foreach ($cves as $cve) {
+            if (!empty($cve->getTag())) {
+                array_push($cvesWithTags, $cve);
+            }
+        }
+        return $cvesWithTags;
     }
 
 
@@ -79,7 +111,7 @@ class CveDefsManager extends DefaultManager
                     $cveDef->setTitle($cveDefDb["title"]);
                     $cveDef->setRefUrl($cveDefDb["refUrl"]);
                     $cveDef->setVdsSubSourceDefId($cveDefDb["vdsSubSourceDefId"]);
-                    $cveDef->setCves($this->getPakiti()->getDao("Cve")->getCvesByCveDef($cveDef));
+                    $cveDef->setCves($this->getCvesByCveDef($cveDef));
                     array_push($cveDefs, $cveDef);
                 }
                 $pkgsCveDefs[$installedPkg->getId()] = $cveDefs;
@@ -87,6 +119,34 @@ class CveDefsManager extends DefaultManager
         }
         return $pkgsCveDefs;
     }
+
+    public function getAllCves()
+    {
+        $cves = $this->getPakiti()->getDao("Cve")->getAllCves();
+        foreach ($cves as $cve) {
+            if (is_object($cve)) {
+                $cve->setTag($this->getPakiti()->getManager("TagsManager")->getCveTags($cve));
+            }
+        }
+        return $cves;
+    }
+
+    public function getCveNames()
+    {
+        return $this->getPakiti()->getDao("Cve")->getCveNames();
+    }
+
+    public function getCvesByName($name)
+    {
+        $cves = $this->getPakiti()->getDao("Cve")->getCvesByName($name);
+        foreach ($cves as $cve) {
+            if (is_object($cve)) {
+                $cve->setTag($this->getPakiti()->getManager("TagsManager")->getCveTags($cve));
+            }
+        }
+        return $cves;
+    }
+
 
     /**
      * For each vulnerable package on host find CVE
