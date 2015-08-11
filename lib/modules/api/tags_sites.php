@@ -22,8 +22,23 @@ if ($type == "") {
 
 //TODO: Add authorization
 
+$hosts = &$pakiti->getManager("VulnerabilitiesManager")->getHostsWithCvesThatContainsSomeTag($htag, $hostGroup, $cve);
+
 switch ($type) {
     case "csv":
         header("Content-Type: text/plain");
-        print "CVE Tag,Site Country,ROC,Site Name,Hostname,Host Architecture,Host OS,CVE Name,CSIRT Mails\n";
+        print "CVE Tag,Site Country,ROC,Host Group,Hostname,Host Architecture,Host OS,CVE Name,CSIRT Mails\n";
+        foreach ($hosts as $host) {
+            foreach ($host["HostGroups"] as $hostGroup) {
+                foreach ($host["CVE"] as $cve) {
+                    foreach ($cve->getTag() as $tag) {
+                        print $tag->getName() . "," . "," . "," . $hostGroup->getName() . "," .
+                            $host["Host"]->getHostname() . "," . $host["Host"]->getArch()->getName() . "," .
+                            $host["Host"]->getOs()->getName() . "," . $cve->getName() . "," . ",";
+                    }
+                }
+            }
+
+        }
+        break;
 }

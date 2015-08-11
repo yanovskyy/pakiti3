@@ -135,20 +135,23 @@ class TagsManager extends DefaultManager {
     }
     Utils::log(LOG_DEBUG, "Assinging the tag to the cve [cveId=" . $cve->getId() . ",tag=" . $tag->getName() . "]", __FILE__, __LINE__);
 
-    # Check if the tag already exists
+    # Check if the already assigned
     $isAssigned =
         $this->getPakiti()->getManager("DbManager")->queryToSingleValue(
             "select 1 from CveTag where
       	 		cveId=" . $this->getPakiti()->getManager("DbManager")->escape($cve->getId()) . " and
       	 		tagId=" . $this->getPakiti()->getManager("DbManager")->escape($tag->getId()));
 
-    if ($isAssigned == null) {
+    if ($isAssigned != null) {
+      throw new Exception($cve->getName() . " is already associated with " . $tag->getName() . " tag!");
+    } else {
       # Association between cve and cveTag doesn't exist, so create it
       $this->getPakiti()->getManager("DbManager")->query("
       		insert into CveTag set
       			cveId=" . $this->getPakiti()->getManager("DbManager")->escape($cve->getId()) . ",
       	 		tagId=" . $this->getPakiti()->getManager("DbManager")->escape($tag->getId()) . ",
       	 		`reason`='" . $this->getPakiti()->getManager("DbManager")->escape($tag->getReason()) . "'");
+
     }
   }
 

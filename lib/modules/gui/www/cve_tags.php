@@ -47,12 +47,20 @@ if(Utils::getHttpPostVar("tag-create-form") == "sent"){
     $tag -> setReason($tagReason);
     $cves = $pakiti ->getManager("CveDefsManager")->getCvesByName($cveName);
 
-    foreach($cves as $cve){
-         $pakiti->getManager("TagsManager")->assignTagToCve($cve, $tag);
+
+    try{
+
+     foreach($cves as $cve){
+        $pakiti->getManager("TagsManager")->assignTagToCve($cve, $tag);
+     }
+
+    $html -> setMessage(sprintf("Tag %s has been associated to %s.", $tagName, $cveName));
+
+    } catch (Exception $e){
+        $html -> setMessage(sprintf("%s", $e->getMessage()));
     }
 
-    //$pakiti -> getDao("Tag") -> create($tag);
-    $html -> setMessage(sprintf("Tag %s created.", $tagName));
+
 
 }
 

@@ -254,27 +254,36 @@ class HTMLModule extends DefaultModule
             <th>&nbsp;</th>
         </tr>";
         $i = 0;
-        foreach ($cves as $cve) {
-            print "
-      	<tr class=\"a" . ($i & 1) . "\">
-              <td> <input type=" . "checkbox" . "> </td>";
+        foreach ($cves as $cveId => $cve) {
+            foreach ($cve->getTag() as $tag) {
+                print "<tr class=\"a" . ($i & 1) . "\">";
+                if ($tag->getEnabled() == 1) {
+                    print "<td> <input type=" . "checkbox" . " checked> </td>";
+                } else {
+                    print "<td> <input type=" . "checkbox" . "> </td>";
+                }
 
-            print "<td>" . $cve->getName() . "</td>";
-            print "<td>" . $cve->getTag()[0]->getName() . "</td>";
-            print "<td>" . $cve->getTag()[0]->getReason() . "</td>";
-            print "<td>" . $cve->getTag()[0]->getModifier() . "</td>";
-            print "<td>" . $cve->getTag()[0]->getTimestamp() . "</td>";
-            print "</tr>";
+
+                print "<td>";
+                print "<span";
+                if ($tag->getName() == "Critical") {
+                    print " class=\"critical_cve\"";
+                }
+
+                if ($tag->getName() == "High") {
+                    print " class=\"high_cve\"";
+                }
+
+                print ">" . $cve->getName() . "</span>";
+                print "</td>";
+                print "<td>" . $tag->getName() . "</td>";
+                print "<td>" . $tag->getReason() . "</td>";
+                print "<td>" . $tag->getModifier() . "</td>";
+                print "<td>" . $tag->getTimestamp() . "</td>";
+                print "</tr>";
+            }
+
         }
-
-
-//        foreach ($cves as $cve) {
-//            print "
-//        	<tr class=\"a" . ($i & 1) . "\">
-//                <td>" . $cve->getName() . "</td>
-//                <td><a href=\"host.php?hostId=" . $host->getId() . "\">" . $host->getHostname() . "</a></td>
-//                <td>";
-//        }
 
         print "</table>";
     }

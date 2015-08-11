@@ -55,6 +55,7 @@ class CveDefsManager extends DefaultManager
                 $cve->setTag($this->getPakiti()->getManager("TagsManager")->getCveTags($cve));
             }
         }
+        return $cves;
     }
 
 
@@ -73,12 +74,20 @@ class CveDefsManager extends DefaultManager
         return $cvesCount;
     }
 
+    /**
+     * Return Cves that have been associated with some Tags without duplicities.
+     * @return array
+     */
     public function getCvesWithTags()
     {
         $cves = $this->getAllCves();
         $cvesWithTags = array();
         foreach ($cves as $cve) {
             if (!empty($cve->getTag())) {
+                if (!in_array($cve->getName(), array_map(function ($cve) {
+                    return $cve->getName();
+                }, $cvesWithTags))
+                )
                 array_push($cvesWithTags, $cve);
             }
         }
@@ -163,7 +172,7 @@ class CveDefsManager extends DefaultManager
             $cves = array();
             foreach ($pkgCveDefs as $pkgCveDef) {
                 foreach ($pkgCveDef->getCves() as $cve) {
-                    array_push($cves, $cve->getName());
+                    array_push($cves, $cve);
                 }
             }
             $pkgsCves[$pkgId] = $cves;
